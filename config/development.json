@@ -1,6 +1,6 @@
 {
   "serverConfig":{
-    "apikey" : "",
+    "apikey" : "xxxxxxxxxxxxxxxxxx3e12",
     "baseApi":"https://gnews.io/api/v4/search"
   }
 }
