@@ -9,35 +9,55 @@ module.exports = {
 async function getNews(params) {
   return new Promise((resolve, reject) => {
     let queryString = `?q=None&lang=en&country=in&max=10`;
-    if(params.searchKey){
-      queryString+=`&q=${params.searchKey}`
+    if (params.searchKey) {
+      queryString += `&q=${params.searchKey}`
     }
-    if(params.category){
+    if (params.category) {
       queryString += `&category=${params.category}`
     }
 
-    if(params.title){
-      queryString+=`&in=title`
+    if (params.title && params.description) {
+
+      queryString += `&in=title,description`
     }
-   
-    if(params.country){
-      if(CONSTANTS.countryCode.indexOf(params.countryCode)<0){
-        return resolve({message:"Country Code not valid"})
+    if (params.title) {
+      queryString += `&in=title`
+    }
+    if (params.description) {
+      queryString += `&in=description`
+    }
+
+    if (params.countryCode) {
+      if (CONSTANTS.countryCode.indexOf(params.countryCode) < 0) {
+        return reject({ message: "Country Code not valid" })
       }
-      queryString+=`&country=${params.countryCode}`
+      queryString += `&country=${params.countryCode}`
     }
     let url = `${appConfig.get("serverConfig").baseApi}?${queryString}&apikey=${appConfig.get("serverConfig").apikey}`;
     axios.get(url)
       .then(function (response) {
-        if(response.status == 200){
-          return resolve(response.data);
-        }else{
-          return reject(response.statusText);
+        if (response.status == 200) {
+          return resolve(formatNews(response.data));
         }
-        
-      }) .catch((err)=>{
+
+      }).catch((err) => {
         reject(err);
       })
   })
 
+}
+
+function formatNews(newData){
+  let news = {totalArticles:newData.totalArticles,articles: []};
+  for(let ele of newData.articles){
+    let obj = {
+      title:ele.title,
+      description:ele.description,
+      content:ele.content,
+      publishedAt:ele.publishedAt,
+      auther:ele.source.name
+    }
+    news.articles.push(obj);
+  }
+  return news;
 }

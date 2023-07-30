@@ -10,7 +10,9 @@ async function getNews(req,res){
         let news = await newService.getNews(req.body);
         responseCreator.createResponse(req,res,200,news)
     }catch(err){
-        responseCreator.createResponse(req,res,500,{message:"some thing wrong."})
+        console.error(err);
+        let statusCode = err && err.response && err.response.status?err.response.status:0;
+        responseCreator.createResponse(req,res, statusCode || 500,{message:err.message || "something went wrong."})
     }
 }
 
